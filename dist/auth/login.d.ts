@@ -1,1 +1,2 @@
-export declare function login(email: string, password: string): Promise<any>;
+import { DBOptions, LoginInput, LoginResult } from '../types';
+export declare function login(input: LoginInput, db: any, options: DBOptions): Promise<LoginResult>;

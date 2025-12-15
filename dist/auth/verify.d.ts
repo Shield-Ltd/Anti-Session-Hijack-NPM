@@ -1,1 +1,2 @@
-export declare function verifySession(): Promise<any>;
+import { DBOptions, VerifyInput, VerifyResult } from '../types';
+export declare function verifySession(input: VerifyInput, db: any, options: DBOptions): Promise<VerifyResult>;

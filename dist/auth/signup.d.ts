@@ -1,1 +1,2 @@
-export declare function signup(name: string, email: string, password: string): Promise<any>;
+import { DBOptions, SignupInput, SignupResult } from '../types';
+export declare function signup(input: SignupInput, db: any, options: DBOptions): Promise<SignupResult>;

@@ -43,7 +43,7 @@ On successful login, the authentication token is stored securely in an HttpOnly 
 
 #### 3️⃣ Verify Session (Protect Routes)
 ```bash
-const result = await verifySession();
+const result = await verifySession(authToken);
 
 if (!result.valid) {
   // Redirect user to login
