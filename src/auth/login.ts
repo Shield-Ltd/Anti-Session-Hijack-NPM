@@ -1,15 +1,15 @@
 import * as jose from 'jose';
 import { DBOptions, LoginInput, LoginResult } from '../types';
 import { verifyPassword, hashToken, generateUUID, generateNonce } from '../utils/crypto';
-import { getFingerprint } from '../utils/getFingerprint';
 
 export async function login(
   input: LoginInput,
   db: any,
+  fingerprint: string,
   options: DBOptions
 ): Promise<LoginResult> {
+
   const { email, password } = input;
-  const fingerprint = await getFingerprint();
   if (!email || !password) {
     throw new Error('Email and password are required');
   }
@@ -43,9 +43,7 @@ export async function login(
   const token = await new jose.SignJWT({
     id: user.id,
     email: user.email,
-    sessionId,
     nonce,
-    fingerprint,
   })
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(options.jwtExpiry || '7d')

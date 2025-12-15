@@ -1,9 +1,7 @@
 import * as jose from 'jose';
 import { hashToken } from '../utils/crypto';
-import { getFingerprint } from '../utils/getFingerprint';
-export async function verifySession(input, db, options) {
+export async function verifySession(input, db, fingerprint, options) {
     const { authToken } = input;
-    const fingerprint = await getFingerprint();
     if (!authToken) {
         return { valid: false };
     }
@@ -25,24 +23,10 @@ export async function verifySession(input, db, options) {
         AND s.fingerprint = ${fingerprint}
     `;
         if (sessions.length === 0) {
-            // Check for hijacking
-            const otherSessions = await db `
-        SELECT id FROM sessions 
-        WHERE auth_token_hash = ${authTokenHash}
-          AND fingerprint != ${fingerprint}
-      `;
-            if (otherSessions.length > 0) {
-                // Hijacking detected - invalidate all sessions for this user
-                const userId = payload.id;
-                await db `
-          DELETE FROM sessions WHERE user_id = ${userId}
-        `;
-                return {
-                    valid: false,
-                    hijacked: true,
-                };
-            }
-            return { valid: false };
+            return {
+                valid: false,
+                hijacked: true
+            };
         }
         const session = sessions[0];
         return {
