@@ -1,5 +1,5 @@
 import { hashPassword, generateUUID } from '../utils/crypto';
-export async function signup(input, db, options) {
+export async function signup(input, db) {
     const { name, email, password } = input;
     if (!name || !email || !password) {
         throw new Error('Name, email, and password are required');
