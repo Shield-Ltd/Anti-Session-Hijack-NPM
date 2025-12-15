@@ -4,7 +4,6 @@ import { hashPassword, generateUUID } from '../utils/crypto';
 export async function signup(
   input: SignupInput,
   db: any,
-  options: DBOptions
 ): Promise<SignupResult> {
   const { name, email, password } = input;
 
