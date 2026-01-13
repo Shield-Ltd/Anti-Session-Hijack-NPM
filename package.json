@@ -1,6 +1,6 @@
 {
   "name": "anti-session-hijack",
-  "version": "1.0.7",
+  "version": "2.0.0",
   "description": "Client SDK for session hijacking prevention",
   "license": "MIT",
   "author": "Ashin Sabu Mathew",
@@ -9,12 +9,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
-  },
-  "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "bcryptjs": "^3.0.3",
-    "crypto": "^1.0.1",
-    "jose": "^6.1.3"
   },
   "devDependencies": {
     "@types/node": "^25.0.2",
