@@ -1,4 +1,4 @@
-export declare function verifySession(authToken: string, fingerprint: string, redis: any): Promise<{
+export declare function verifySession(authTokenHash: string, fingerprint: string, redis: any): Promise<{
     valid: boolean;
     receivedFingerprint?: undefined;
     hijacked?: undefined;

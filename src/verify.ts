@@ -1,5 +1,5 @@
-export async function verifySession(authToken: string, fingerprint: string, redis: any){
-  if (!authToken) {
+export async function verifySession(authTokenHash: string, fingerprint: string, redis: any){
+  if (!authTokenHash) {
     return { valid: false };
   }
 
@@ -8,9 +8,9 @@ export async function verifySession(authToken: string, fingerprint: string, redi
   }
 
   try {
-    const originalFingerprint =  await redis.get(authToken);
+    const originalFingerprint =  await redis.get(authTokenHash);
 
-    if (originalFingerprint == fingerprint || originalFingerprint == null) {
+    if (originalFingerprint == fingerprint) {
         return {
             receivedFingerprint: originalFingerprint,
             valid: true, 
