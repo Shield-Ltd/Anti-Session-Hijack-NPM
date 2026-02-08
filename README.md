@@ -24,7 +24,7 @@ npm i anti-session-hijack
 - If they differ → session hijack detected
 
 ### API Reference
-**addSession(authTokenHash, fingerprint, redis)**
+`addSession(authTokenHash, fingerprint, redis)`
 Stores a new session in Redis.
 
 ##### Example
@@ -34,7 +34,7 @@ import { addSession } from "anti-session-hijack";
 await addSession(authTokenHash, fingerprint, redis);
 ```
 
-**verifySession(authTokenHash, fingerprint, redis)**
+`verifySession(authTokenHash, fingerprint, redis)`
 Verifies if the session is valid or hijacked.
 
 Returns
@@ -52,6 +52,36 @@ import { verifySession } from "anti-session-hijack";
 
 const result = await verifySession(authTokenHash, fingerprint, redis);
 ```
+
+
+`email(service, senderEmail, senderAppPassword, receiverEmail)`
+Sends a session hijack alert email to the affected user.
+```bash
+import { email } from "anti-session-hijack";
+await email(
+  "gmail",
+  process.env.EMAIL_ID!,
+  process.env.EMAIL_APP_PASSWORD!,
+  userEmail
+);
+```
+##### Email Content Sent to User: 
+```bash
+Subject: "Security Alert: Session Hijacked",
+Body:
+Hello,
+We detected suspicious activity on your account.
+Your session appears to have been hijacked.
+To protect your account, please:
+1. Log out immediately
+2. Log in again
+3. Change your password if needed
+If this was not you, take action as soon as possible to secure your account.
+
+Stay safe,
+Security Team
+```
+This email is intended to immediately alert the user and guide them to secure their account.
 
 ## Redis Compatibility
 
