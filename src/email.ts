@@ -1,13 +1,13 @@
 import * as nodemailer from 'nodemailer';
 
 export async function email(
-    service: string,
-    sender_mail: string,
-    sender_app_password: string,
-    receiver_mail: string
+  service: string,
+  sender_mail: string,
+  sender_app_password: string,
+  receiver_mail: string
 ): Promise<void> {
   const transporter = nodemailer.createTransport({
-    service: service,
+    service,
     auth: {
       user: sender_mail,
       pass: sender_app_password
@@ -17,24 +17,26 @@ export async function email(
   const mailOptions = {
     from: sender_mail,
     to: receiver_mail,
-    subject: "Security Alert: Session Hijacked",
-    text: `
-Hello,
+    subject: 'Immediate Action Required: Session Compromise Detected',
+    text:
+`Hello,
 
-We detected suspicious activity on your account.
+Shield detected unauthorized access to your account through a compromised session.
 
-Your session appears to have been hijacked.
-To protect your account, please:
+The affected session has been terminated to prevent further access.
 
-1. Log out immediately
-2. Log in again
-3. Change your password if needed
+REQUIRED ACTIONS:
+- Log out from all devices immediately
+- Change your account password immediately
+- Log in again from a trusted device
+- Review recent account activity
 
-If this was not you, take action as soon as possible to secure your account.
+Failure to act quickly may put your data at risk.
 
-Stay safe,
-Security Team
-    `
+If you do not recognize this activity, your credentials may be compromised.
+
+— Shield Incident Response Team
+shieldcorporationsltd@gmail.com`
   };
 
   await transporter.sendMail(mailOptions);
