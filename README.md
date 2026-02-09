@@ -67,19 +67,26 @@ await email(
 ```
 ##### Email Content Sent to User: 
 ```bash
-Subject: "Security Alert: Session Hijacked",
+Subject: "Immediate Action Required: Session Compromise Detected",
 Body:
 Hello,
-We detected suspicious activity on your account.
-Your session appears to have been hijacked.
-To protect your account, please:
-1. Log out immediately
-2. Log in again
-3. Change your password if needed
-If this was not you, take action as soon as possible to secure your account.
 
-Stay safe,
-Security Team
+Shield detected unauthorized access to your account through a compromised session.
+
+The affected session has been terminated to prevent further access.
+
+REQUIRED ACTIONS:
+- Log out from all devices immediately
+- Change your account password immediately
+- Log in again from a trusted device
+- Review recent account activity
+
+Failure to act quickly may put your data at risk.
+
+If you do not recognize this activity, your credentials may be compromised.
+
+— Shield Incident Response Team
+shieldcorporationsltd@gmail.com
 ```
 This email is intended to immediately alert the user and guide them to secure their account.
 
