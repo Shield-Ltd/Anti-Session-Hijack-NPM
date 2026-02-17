@@ -1,114 +1,141 @@
 # anti-session-hijack
 
-A lightweight session hijacking detection library for modern web applications using Redis.
-Designed for Next.js App Router, serverless, and edge-compatible environments.
+[![npm version](https://img.shields.io/npm/v/anti-session-hijack.svg)](https://www.npmjs.com/package/anti-session-hijack)
+[![npm downloads](https://img.shields.io/npm/dt/anti-session-hijack.svg)](https://www.npmjs.com/package/anti-session-hijack)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A lightweight session hijacking detection library for modern web applications using Redis. Designed for Next.js App Router, serverless, and edge-compatible environments.
 
 This package detects session hijacking by binding an authentication token to a browser/device fingerprint and validating it on every request.
 
-### Features
-- Detects stolen or reused auth tokens
-- Fingerprint-based session binding
-- Redis-backed (Upstash / ioredis / node-redis)
-- Framework-agnostic (works with Next.js, Express, etc.)
-- Minimal & dependency-free
+## GitHub Repository
+[Anti Session Hijack](https://github.com/Shield-Ltd/Anti-Session-Hijack-NPM)
 
-### Installation
+## Installation
+
 ```bash
-npm i anti-session-hijack
+npm install anti-session-hijack
 ```
 
-### How It Works
-- On login, hash the auth token and store it in Redis with the user’s fingerprint
-- On every request, recompute the fingerprint
-- Compare the stored fingerprint with the received one
-- If they differ → session hijack detected
+## Features
 
-### API Reference
-`addSession(authTokenHash, fingerprint, redis)`
-Stores a new session in Redis.
+- Detects stolen or reused authentication tokens.
+- Fingerprint-based session binding.
+- Redis-backed (compatible with Upstash, ioredis, and node-redis)
+- Minimal and dependency-free core.
+- TypeScript support included.
 
-##### Example
-```bash
-import { addSession } from "anti-session-hijack";
+## Usage
 
-await addSession(authTokenHash, fingerprint, redis);
+### 1. Client-Side: Generate Fingerprint
+
+To obtain the browser's unique identifier in a React or Next.js Client Component, use the `generateFingerprint` function inside a `useEffect` hook.
+
+```typescript
+import { generateFingerprint } from "anti-session-hijack";
+import { useEffect, useState } from "react";
+
+// ... inside your component
+const [visitorId, setVisitorId] = useState<string>("");
+
+useEffect(() => {
+  const getFingerprint = async () => {
+    const result = await generateFingerprint();
+    setVisitorId(result.id);
+  };
+
+  getFingerprint();
+}, []);
 ```
 
-`verifySession(authTokenHash, fingerprint, redis)`
-Verifies if the session is valid or hijacked.
+### 2. Server-Side: Manage Sessions
 
-Returns
-```bash
-{
-  valid: boolean;
-  hijacked?: boolean;
-  receivedFingerprint?: string;
+Import the server-side functions to add and verify sessions.
+
+```typescript
+import { addSession, verifySession, email } from "anti-session-hijack";
+```
+
+## API Reference
+
+### `generateFingerprint()`
+
+Collects browser signals (hardware, OS, canvas, etc.) to generate a unique fingerprint.
+
+- **Parameters**: None.
+- **Returns**: `Promise<FingerprintResult>`
+  - `id` (string): The unique 64-character hexadecimal fingerprint hash.
+  - `components` (object): The raw components used to generate the fingerprint.
+  - `version` (string): The version of the fingerprinting algorithm.
+  - `time` (number): Timestamp of generation.
+
+### `addSession(authTokenHash, fingerprint, redis)`
+
+Associates a hashed authentication token with a browser fingerprint in Redis. Call this function upon successful user login.
+
+- **Parameters**:
+  - `authTokenHash` (string): The hashed version of the authentication token.
+  - `fingerprint` (string): The unique browser fingerprint generated on the client side.
+  - `redis` (object): A Redis client instance (e.g., `@upstash/redis`, `ioredis`).
+- **Returns**: `Promise<void>`
+
+**Example:**
+```typescript
+await addSession(hashedToken, userFingerprint, redisClient);
+```
+
+### `verifySession(authTokenHash, fingerprint, redis)`
+
+Checks if the provide fingerprint matches the one stored for the given authentication token. Call this on every protected request or route.
+
+- **Parameters**:
+  - `authTokenHash` (string): The hashed authentication token to verify.
+  - `fingerprint` (string): The current browser fingerprint received from the client.
+  - `redis` (object): The Redis client instance.
+- **Returns**: `Promise<object>`
+  - `valid` (boolean): `true` if the session is valid (fingerprints match), `false` otherwise.
+  - `hijacked` (boolean): `true` if the fingerprints do not match (potential hijacking), `false` otherwise.
+  - `receivedFingerprint` (string | undefined): The fingerprint currently stored in Redis (useful for debugging).
+
+**Example:**
+```typescript
+const result = await verifySession(hashedToken, currentFingerprint, redisClient);
+
+if (result.hijacked) {
+  // Handle session hijacking (e.g., revoke session, send alert)
 }
 ```
 
-##### Example
-```bash
-import { verifySession } from "anti-session-hijack";
+### `email(service, senderEmail, senderAppPassword, receiverEmail)`
 
-const result = await verifySession(authTokenHash, fingerprint, redis);
-```
+Sends a standardized security alert email to the user indicating a session compromise.
 
+- **Parameters**:
+  - `service` (string): The email service provider (e.g., "gmail").
+  - `senderEmail` (string): The email address used to send the alert.
+  - `senderAppPassword` (string): The application-specific password for the sender email account.
+  - `receiverEmail` (string): The recipient's email address.
+- **Returns**: `Promise<void>`
 
-`email(service, senderEmail, senderAppPassword, receiverEmail)`
-Sends a session hijack alert email to the affected user.
-```bash
-import { email } from "anti-session-hijack";
+**Example:**
+```typescript
 await email(
   "gmail",
-  process.env.EMAIL_ID!,
-  process.env.EMAIL_APP_PASSWORD!,
+  process.env.EMAIL_USER,
+  process.env.EMAIL_PASSWORD,
   userEmail
 );
 ```
-##### Email Content Sent to User: 
-```bash
-Subject: "Immediate Action Required: Session Compromise Detected",
-Body:
-Hello,
-
-Shield detected unauthorized access to your account through a compromised session.
-
-The affected session has been terminated to prevent further access.
-
-REQUIRED ACTIONS:
-- Log out from all devices immediately
-- Change your account password immediately
-- Log in again from a trusted device
-- Review recent account activity
-
-Failure to act quickly may put your data at risk.
-
-If you do not recognize this activity, your credentials may be compromised.
-
-— Shield Incident Response Team
-shieldcorporationsltd@gmail.com
-```
-This email is intended to immediately alert the user and guide them to secure their account.
 
 ## Redis Compatibility
 
-This package works with any Redis client that supports:
-```bash
-redis.get(key)
-redis.set(key, value)
-```
-Recommended (Serverless): **Upstash Redis**
+This package is compatible with any Redis client that exposes standard `get` and `set` methods.
 
-Also Works With:
-- ioredis
-- node-redis
-- Redis Cloud
-
-
-## Limitations
-- Does not generate fingerprints (you must provide one): Recommended [FingerprintJS](https://github.com/fingerprintjs/fingerprintjs)
-- Does not handle logout/session cleanup
-- Fingerprint mismatch may occur for VPNs or browser updates
+- **Recommended**: `@upstash/redis` (for serverless/edge).
+- **Supported**: `ioredis`, `redis` (node-redis).
 
 ## Author
+
 [Ashin Sabu Mathew](https://github.com/AshinSMathew)
+
+[Deon Sebastian](https://github.com/deonsebastian)
