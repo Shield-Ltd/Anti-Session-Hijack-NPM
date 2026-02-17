@@ -6,7 +6,7 @@
   "author": "Ashin Sabu Mathew",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AshinSMathew/anti-session-hijack.git"
+    "url": "https://github.com/Shield-Ltd/Anti-Session-Hijack-NPM.git"
   },
   "type": "module",
   "main": "./dist/index.js",
