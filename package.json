@@ -6,14 +6,35 @@
   "author": "Ashin Sabu Mathew",
   "type": "module",
   "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "browser": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      },
+      "node": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "build:demo": "tsc && vite build --mode demo",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@types/node": "^25.0.2",
     "@types/nodemailer": "^7.0.9",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.0.0"
   },
   "dependencies": {
     "nodemailer": "^8.0.1"
