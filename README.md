@@ -189,6 +189,7 @@ This package works with any Redis client that exposes standard `get` and `set` m
 
 - [Ashin Sabu Mathew](https://github.com/AshinSMathew)
 - [Deon Sebastian](https://github.com/deonsebastian)
+- [Goldi Babu](https://github.com/goldibabu14)
 
 ---
 
