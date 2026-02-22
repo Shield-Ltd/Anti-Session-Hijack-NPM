@@ -127,6 +127,26 @@ await email(
 );
 ```
 
+### `generateAuthToken(jwtSecret, options)`
+
+Generates a JWT authentication token with a unique nonce to prevent replay attacks.
+
+- **Parameters**:
+  - `jwtSecret` (string): The secret key used to sign the JWT.
+  - `options` (GenerateAuthTokenOptions): Configuration options for the token.
+    - `payload` (Record<string, any>): The data to include in the token payload.
+    - `expiresIn` (string, optional): Token expiration time (default: "7d").
+    - `algorithm` (string, optional): Signing algorithm (default: "HS256").
+- **Returns**: `Promise<string>` - The signed JWT token.
+
+**Example:**
+```typescript
+const token = await generateAuthToken("your-secret-key", {
+  payload: { userId: 123, role: "admin" },
+  expiresIn: "1h"
+});
+```
+
 ## Redis Compatibility
 
 This package is compatible with any Redis client that exposes standard `get` and `set` methods.
