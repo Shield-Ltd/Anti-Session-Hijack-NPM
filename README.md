@@ -1,15 +1,23 @@
 # anti-session-hijack
 
-[![npm version](https://img.shields.io/npm/v/anti-session-hijack.svg)](https://www.npmjs.com/package/anti-session-hijack)
-[![npm downloads](https://img.shields.io/npm/dt/anti-session-hijack.svg)](https://www.npmjs.com/package/anti-session-hijack)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+  <a href="https://www.npmjs.com/package/anti-session-hijack"><img src="https://img.shields.io/npm/v/anti-session-hijack.svg" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/anti-session-hijack"><img src="https://img.shields.io/npm/dt/anti-session-hijack.svg" alt="npm downloads" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
+</p>
 
-A lightweight session hijacking detection library for modern web applications using Redis. Designed for Next.js App Router, serverless, and edge-compatible environments.
+<p align="center">
+  A lightweight session hijacking detection library for modern web applications using Redis.<br/>
+  Designed for Next.js App Router, serverless, and edge-compatible environments.
+</p>
 
-This package detects session hijacking by binding an authentication token to a browser/device fingerprint and validating it on every request.
+---
 
-## GitHub Repository
-[Anti Session Hijack](https://github.com/Shield-Ltd/Anti-Session-Hijack-NPM)
+## Overview
+
+`anti-session-hijack` detects session hijacking by binding an authentication token to a browser and device fingerprint, then validating that binding on every request. If the fingerprint changes — indicating a stolen token being used from a different device — the session is flagged immediately.
+
+---
 
 ## Installation
 
@@ -17,107 +25,113 @@ This package detects session hijacking by binding an authentication token to a b
 npm install anti-session-hijack
 ```
 
+---
+
 ## Features
 
-- Detects stolen or reused authentication tokens.
-- Fingerprint-based session binding.
-- Redis-backed (compatible with Upstash, ioredis, and node-redis)
-- Minimal and dependency-free core.
-- TypeScript support included.
+- Stolen and reused authentication token detection
+- Fingerprint-based session binding
+- Redis-backed storage (compatible with Upstash, ioredis, and node-redis)
+- Minimal, dependency-free core
+- Full TypeScript support
 
-## Usage
-
-### 1. Client-Side: Generate Fingerprint
-
-To obtain the browser's unique identifier in a React or Next.js Client Component, use the `generateFingerprint` function inside a `useEffect` hook.
-
-```typescript
-import { generateFingerprint } from "anti-session-hijack";
-import { useEffect, useState } from "react";
-
-// ... inside your component
-const [visitorId, setVisitorId] = useState<string>("");
-
-useEffect(() => {
-  const getFingerprint = async () => {
-    const result = await generateFingerprint();
-    setVisitorId(result.id);
-  };
-
-  getFingerprint();
-}, []);
-```
-
-### 2. Server-Side: Manage Sessions
-
-Import the server-side functions to add and verify sessions.
-
-```typescript
-import { addSession, verifySession, email } from "anti-session-hijack";
-```
+---
 
 ## API Reference
 
 ### `generateFingerprint()`
 
-Collects browser signals (hardware, OS, canvas, etc.) to generate a unique fingerprint.
+Collects browser signals — hardware, OS, canvas, and more — and produces a SHA-256 hash of those components as a stable, unique device identifier.
 
-- **Parameters**: None.
-- **Returns**: `Promise<FingerprintResult>`
-  - `id` (string): The unique 64-character hexadecimal fingerprint hash.
-  - `components` (object): The raw components used to generate the fingerprint.
-  - `version` (string): The version of the fingerprinting algorithm.
-  - `time` (number): Timestamp of generation.
+**Parameters:** None
+
+**Returns:** `Promise<FingerprintResult>` — An object containing `id` (a 64-character hexadecimal SHA-256 hash), the raw `components` used in hashing, the algorithm `version`, and a generation `time` timestamp.
+
+```typescript
+"use client";
+
+import { generateFingerprint } from "anti-session-hijack";
+import { useEffect, useState } from "react";
+
+const [fingerprint, setFingerprint] = useState<string>("");
+
+useEffect(() => {
+  const load = async () => {
+    const result = await generateFingerprint();
+    setFingerprint(result.id);
+  };
+
+  load();
+}, []);
+```
+
+---
 
 ### `addSession(authTokenHash, fingerprint, redis)`
 
-Associates a hashed authentication token with a browser fingerprint in Redis. Call this function upon successful user login.
+Associates a hashed authentication token with a browser fingerprint in Redis. Call this upon successful user login.
 
-- **Parameters**:
-  - `authTokenHash` (string): The hashed version of the authentication token.
-  - `fingerprint` (string): The unique browser fingerprint generated on the client side.
-  - `redis` (object): A Redis client instance (e.g., `@upstash/redis`, `ioredis`).
-- **Returns**: `Promise<void>`
+**Parameters:**
 
-**Example:**
+| Parameter | Type | Description |
+|---|---|---|
+| `authTokenHash` | `string` | The hashed version of the authentication token |
+| `fingerprint` | `string` | The unique browser fingerprint from the client |
+| `redis` | `object` | A Redis client instance (`@upstash/redis`, `ioredis`, etc.) |
+
+**Returns:** `Promise<void>`
+
 ```typescript
 await addSession(hashedToken, userFingerprint, redisClient);
 ```
 
+---
+
 ### `verifySession(authTokenHash, fingerprint, redis)`
 
-Checks if the provide fingerprint matches the one stored for the given authentication token. Call this on every protected request or route.
+Checks whether the provided fingerprint matches the one stored for the given authentication token. Call this on every protected request or route.
 
-- **Parameters**:
-  - `authTokenHash` (string): The hashed authentication token to verify.
-  - `fingerprint` (string): The current browser fingerprint received from the client.
-  - `redis` (object): The Redis client instance.
-- **Returns**: `Promise<object>`
-  - `valid` (boolean): `true` if the session is valid (fingerprints match), `false` otherwise.
-  - `hijacked` (boolean): `true` if the fingerprints do not match (potential hijacking), `false` otherwise.
-  - `receivedFingerprint` (string | undefined): The fingerprint currently stored in Redis (useful for debugging).
+**Parameters:**
 
-**Example:**
+| Parameter | Type | Description |
+|---|---|---|
+| `authTokenHash` | `string` | The hashed authentication token to verify |
+| `fingerprint` | `string` | The current browser fingerprint from the client |
+| `redis` | `object` | A Redis client instance |
+
+**Returns:** `Promise<object>`
+
+| Field | Type | Description |
+|---|---|---|
+| `valid` | `boolean` | `true` if fingerprints match |
+| `hijacked` | `boolean` | `true` if fingerprints do not match |
+| `receivedFingerprint` | `string \| undefined` | Fingerprint currently stored in Redis (for debugging) |
+
 ```typescript
 const result = await verifySession(hashedToken, currentFingerprint, redisClient);
 
 if (result.hijacked) {
-  // Handle session hijacking (e.g., revoke session, send alert)
+  // Revoke session, notify user, or trigger an alert
 }
 ```
 
+---
+
 ### `email(service, senderEmail, senderAppPassword, receiverEmail)`
 
-Sends a standardized security alert email to the user indicating a session compromise.
+Sends a standardized security alert email to the user indicating a potential session compromise.
 
-- **Parameters**:
-  - `service` (string): The email service provider (e.g., "gmail").
-  - `senderEmail` (string): The email address used to send the alert.
-  - `senderAppPassword` (string): The application-specific password for the sender email account.
-  - `receiverEmail` (string): The recipient's email address.
-- **Returns**: `Promise<void>`
+**Parameters:**
 
-**Example:**
+| Parameter | Type | Description |
+|---|---|---|
+| `service` | `string` | Email service provider (e.g., `"gmail"`) |
+| `senderEmail` | `string` | Address used to send the alert |
+| `senderAppPassword` | `string` | Application-specific password for the sender account |
+| `receiverEmail` | `string` | Recipient's email address |
+
+**Returns:** `Promise<void>`
+
 ```typescript
 await email(
   "gmail",
@@ -127,35 +141,57 @@ await email(
 );
 ```
 
+---
+
 ### `generateAuthToken(jwtSecret, options)`
 
-Generates a JWT authentication token with a unique nonce to prevent replay attacks.
+Generates a signed JWT authentication token with a unique nonce to prevent replay attacks.
 
-- **Parameters**:
-  - `jwtSecret` (string): The secret key used to sign the JWT.
-  - `options` (GenerateAuthTokenOptions): Configuration options for the token.
-    - `payload` (Record<string, any>): The data to include in the token payload.
-    - `expiresIn` (string, optional): Token expiration time (default: "7d").
-    - `algorithm` (string, optional): Signing algorithm (default: "HS256").
-- **Returns**: `Promise<string>` - The signed JWT token.
+**Parameters:**
 
-**Example:**
+| Parameter | Type | Description |
+|---|---|---|
+| `jwtSecret` | `string` | Secret key used to sign the JWT |
+| `options.payload` | `Record<string, any>` | Data to include in the token payload |
+| `options.expiresIn` | `string` (optional) | Token expiration time (default: `"7d"`) |
+| `options.algorithm` | `string` (optional) | Signing algorithm (default: `"HS256"`) |
+
+**Returns:** `Promise<string>` — The signed JWT token.
+
 ```typescript
 const token = await generateAuthToken("your-secret-key", {
   payload: { userId: 123, role: "admin" },
-  expiresIn: "1h"
+  expiresIn: "1h",
 });
 ```
 
+---
+
 ## Redis Compatibility
 
-This package is compatible with any Redis client that exposes standard `get` and `set` methods.
+This package works with any Redis client that exposes standard `get` and `set` methods.
 
-- **Recommended**: `@upstash/redis` (for serverless/edge).
-- **Supported**: `ioredis`, `redis` (node-redis).
+| Client | Support |
+|---|---|
+| `@upstash/redis` | Recommended for serverless and edge environments |
+| `ioredis` | Fully supported |
+| `redis` (node-redis) | Fully supported |
 
-## Author
+---
 
-[Ashin Sabu Mathew](https://github.com/AshinSMathew)
+## Repository
 
-[Deon Sebastian](https://github.com/deonsebastian)
+[github.com/Shield-Ltd/Anti-Session-Hijack-NPM](https://github.com/Shield-Ltd/Anti-Session-Hijack-NPM)
+
+---
+
+## Authors
+
+- [Ashin Sabu Mathew](https://github.com/AshinSMathew)
+- [Deon Sebastian](https://github.com/deonsebastian)
+
+---
+
+## License
+
+[MIT](https://opensource.org/licenses/MIT)
