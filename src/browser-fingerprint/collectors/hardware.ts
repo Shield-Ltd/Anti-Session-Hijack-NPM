@@ -8,9 +8,9 @@ export async function getHardwareSignals(): Promise<Record<string, unknown>> {
         if ('deviceMemory' in navigator) {
             result.memory = (navigator as any).deviceMemory;
         }
-        if ('maxTouchPoints' in navigator) {
-            result.touchPoints = navigator.maxTouchPoints;
-        }
+        // if ('maxTouchPoints' in navigator) {
+        //     result.touchPoints = navigator.maxTouchPoints;
+        // }
     }
 
     return result;

@@ -16,9 +16,8 @@ export async function getOsSignals() {
             // We can't use getHighEntropyValues deeply without async and potentially prompt,
             // so we stick to the basic properties available on the object if any.
             const uaData = navigator.userAgentData;
-            result.mobile = uaData.mobile;
-            if (uaData.platform)
-                result.uaPlatform = uaData.platform;
+            //result.mobile = uaData.mobile;
+            //if (uaData.platform) result.uaPlatform = uaData.platform;
             if (uaData.brands) {
                 result.brands = uaData.brands.map((b) => `${b.brand} v${b.version}`).join(',');
             }

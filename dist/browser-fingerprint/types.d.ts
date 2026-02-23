@@ -4,7 +4,6 @@ export interface SignalCollector {
 }
 export interface FingerprintComponent {
     value: unknown;
-    duration: number;
 }
 export interface FingerprintResult {
     id: string;

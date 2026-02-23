@@ -7,9 +7,9 @@ export async function getHardwareSignals() {
         if ('deviceMemory' in navigator) {
             result.memory = navigator.deviceMemory;
         }
-        if ('maxTouchPoints' in navigator) {
-            result.touchPoints = navigator.maxTouchPoints;
-        }
+        // if ('maxTouchPoints' in navigator) {
+        //     result.touchPoints = navigator.maxTouchPoints;
+        // }
     }
     return result;
 }

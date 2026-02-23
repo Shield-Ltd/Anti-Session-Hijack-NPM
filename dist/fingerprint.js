@@ -10,18 +10,18 @@ export async function generateFingerprint() {
     /* const startTime = Date.now(); */
     const components = {};
     const collect = async (key, fn) => {
-        const t0 = performance.now();
+        //const t0 = performance.now();
         try {
             const value = await fn();
             components[key] = {
                 value,
-                duration: performance.now() - t0
+                //duration: performance.now() - t0
             };
         }
         catch (e) {
             components[key] = {
                 value: { error: e.message },
-                duration: performance.now() - t0
+                //duration: performance.now() - t0
             };
         }
     };

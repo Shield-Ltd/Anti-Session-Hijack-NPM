@@ -13,17 +13,17 @@ export async function generateFingerprint(): Promise<FingerprintResult> {
     const components: Record<string, FingerprintComponent> = {};
 
     const collect = async (key: string, fn: () => Promise<unknown>) => {
-        const t0 = performance.now();
+        //const t0 = performance.now();
         try {
             const value = await fn();
             components[key] = {
                 value,
-                duration: performance.now() - t0
+                //duration: performance.now() - t0
             };
         } catch (e) {
             components[key] = {
                 value: { error: (e as Error).message },
-                duration: performance.now() - t0
+                //duration: performance.now() - t0
             };
         }
     };

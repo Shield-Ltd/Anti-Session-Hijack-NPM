@@ -5,7 +5,7 @@ export interface SignalCollector {
 
 export interface FingerprintComponent {
     value: unknown;
-    duration: number; // ms taken to collect
+    //duration: number; // ms taken to collect
 }
 
 export interface FingerprintResult {
