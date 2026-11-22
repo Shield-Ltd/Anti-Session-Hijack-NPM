@@ -42,6 +42,6 @@
   },
   "dependencies": {
     "jose": "^6.2.8",
-    "nodemailer": "^9.0.5"
+    "nodemailer": "^10.6.1"
   }
 }
